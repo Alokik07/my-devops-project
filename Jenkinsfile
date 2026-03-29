@@ -20,7 +20,7 @@ pipeline {
             }
         }
 
-        stage('Push to Docker Hub') {
+        stage('Push Image') {
             steps {
                 sh 'docker push $IMAGE_NAME'
             }
