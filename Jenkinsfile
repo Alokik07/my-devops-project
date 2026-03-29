@@ -1,35 +1,37 @@
 pipeline {
     agent any
 
+    environment {
+        IMAGE_NAME = "alokik7/myapp"
+        CONTAINER_NAME = "myapp-container"
+    }
+
     stages {
+
         stage('Clone Code') {
             steps {
                 git branch: 'main', url: 'https://github.com/Alokik07/my-devops-project.git'
             }
         }
 
-        stage('Build Docker Image') {
+        stage('Build Image') {
             steps {
-                sh 'docker build -t myapp .'
-            }
-        }
-
-        stage('Tag Image') {
-            steps {
-                sh 'docker tag myapp yourusername/myapp'
+                sh 'docker build -t $IMAGE_NAME .'
             }
         }
 
         stage('Push to Docker Hub') {
             steps {
-                sh 'docker push yourusername/myapp'
+                sh 'docker push $IMAGE_NAME'
             }
         }
 
         stage('Deploy Container') {
             steps {
-                sh 'docker rm -f myapp-container || true'
-                sh 'docker run -d -p 5000:5000 --name myapp-container yourusername/myapp'
+                sh '''
+                docker rm -f $CONTAINER_NAME || true
+                docker run -d -p 5000:5000 --name $CONTAINER_NAME $IMAGE_NAME
+                '''
             }
         }
     }
